@@ -19,6 +19,7 @@
         {
             for(int i = 0; i < 1000000; i++)
             {
+                // All or Nothing / 실행이 되거나 안되거나
                 Interlocked.Increment(ref number); // 값을 직접 사용하지 않고 주소의 참조값을 통해 원자성을 보장해준다.
 
                 //number++;
