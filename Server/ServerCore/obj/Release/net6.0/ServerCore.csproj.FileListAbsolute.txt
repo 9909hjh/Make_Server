@@ -1,0 +1,14 @@
+D:\Unity_ST\Make_Server\Server\ServerCore\bin\Release\net6.0\ServerCore.exe
+D:\Unity_ST\Make_Server\Server\ServerCore\bin\Release\net6.0\ServerCore.deps.json
+D:\Unity_ST\Make_Server\Server\ServerCore\bin\Release\net6.0\ServerCore.runtimeconfig.json
+D:\Unity_ST\Make_Server\Server\ServerCore\bin\Release\net6.0\ServerCore.dll
+D:\Unity_ST\Make_Server\Server\ServerCore\bin\Release\net6.0\ServerCore.pdb
+D:\Unity_ST\Make_Server\Server\ServerCore\obj\Release\net6.0\ServerCore.GeneratedMSBuildEditorConfig.editorconfig
+D:\Unity_ST\Make_Server\Server\ServerCore\obj\Release\net6.0\ServerCore.AssemblyInfoInputs.cache
+D:\Unity_ST\Make_Server\Server\ServerCore\obj\Release\net6.0\ServerCore.AssemblyInfo.cs
+D:\Unity_ST\Make_Server\Server\ServerCore\obj\Release\net6.0\ServerCore.csproj.CoreCompileInputs.cache
+D:\Unity_ST\Make_Server\Server\ServerCore\obj\Release\net6.0\ServerCore.dll
+D:\Unity_ST\Make_Server\Server\ServerCore\obj\Release\net6.0\refint\ServerCore.dll
+D:\Unity_ST\Make_Server\Server\ServerCore\obj\Release\net6.0\ServerCore.pdb
+D:\Unity_ST\Make_Server\Server\ServerCore\obj\Release\net6.0\ServerCore.genruntimeconfig.cache
+D:\Unity_ST\Make_Server\Server\ServerCore\obj\Release\net6.0\ref\ServerCore.dll
