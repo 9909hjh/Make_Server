@@ -2,27 +2,36 @@
 {
     internal class Program
     {
-        // 경합 조건
-        /* number++는 코드상으로 볼 때 한번에 실행되는 코드지만 어샘블리에서 컴퓨터가 처리할 때는 3번에 나눠서 더하기가 진행이 된다.
-         * 이렇게 되면 멀티쓰레드에서 number의 값을 누가 사용하고 있는지 알 수 없을 때 값이 중복되어 더해지거나 빼질 수 있다. 
-         때문에 원자성 즉, atomic의 개념이 존재한다. 
+        // Lock 기초
+        // Interlocked은 계산을 구현하는게 어려울 수 있다. 때문에 다른 방식의 Lock의 개념을 적용
+        // Monitor.Enter/Exit... 
+        // 단점 - 관리하기가 조금 어려울 수 있다. 그리고 데드락이 발생할 수 있다.
 
-        만약 유저간 거래를 한다고 가정해보자. 거래를 통해 돈은 빠져 나가고 아이템이 들어올 텐데
-        그 과정서 돈을 주고 나서 서버가 다운이 된다면 돈은 빠져가지만 아이템은 안들어오는 상태가 될 것이다.
-        때문에 이를 방지하기 위해 원자성의 개념을 사용한다. (InterLocked 등, CPU에서 처리해주는 명령어가 따로 있긴하다.)
-
-        */
+        // 그런 단점을 보완하기 위해 lock()라는 키워드가 있다 -> 데드락 방지가 가능하다.
 
         static int number = 0;
+        static object _obj = new object();
 
         static void Thread_1()
         {
             for(int i = 0; i < 1000000; i++)
             {
-                // All or Nothing / 실행이 되거나 안되거나
-                Interlocked.Increment(ref number); // 값을 직접 사용하지 않고 주소의 참조값을 통해 원자성을 보장해준다.
+                lock(_obj) // Monitor.Enter/Exit와 같은역할
+                {
+                    number++;
+                }
+
+                //// 상호배제 Mutual Exlusive
+
+                //Monitor.Enter(_obj); // 문을 잠구는 행위
+                ////{
+                //    // 만약 여기서 Exit를 안해주고 return을 해버리면 
+                //    // Thread_2는 데드락(DeadLock)이 상태가 된다. 때문에 주의 해야한다.
+                ////}
 
                 //number++;
+
+                //Monitor.Exit(_obj); // 잠금을 풀어준다.
             }
         }
 
@@ -30,8 +39,10 @@
         {
             for (int i = 0; i < 1000000; i++)
             {
-                Interlocked.Decrement(ref number);
-                //number--;
+                lock (_obj) // Monitor.Enter/Exit와 같은역할
+                {
+                    number--;
+                }
             }
         }
 
