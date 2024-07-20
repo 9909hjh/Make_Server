@@ -1,20 +1,21 @@
 ﻿namespace ServerCore
 {
-    /* AutoResetEvent */
-    // 톨게이트 같은 느낌
+    /* ManualResetEvent */
+    // 방 문같은 개념
     class Lock
     {
-        AutoResetEvent _available = new AutoResetEvent(true); // _available가 true면 누구나 들어올 수 있는 상태, false면 반대.
+        ManualResetEvent _available = new ManualResetEvent(true); // _available가 true면 누구나 들어올 수 있는 상태, false면 반대.
         
         public void Acquire()
         {
             _available.WaitOne(); // 입장 시도.
-            //_available.Reset(); // bool = false <- 이건 WaitOne에 세트로 들어가 있다.
+            _available.Reset(); // 문을 닫는다. // AutoReset과는 다르게 동작해서 Reset을 추가한다.
+                                // 나눠져서 값이 다르게 나온다.
         }
 
         public void Release()
         {
-            _available?.Set();
+            _available?.Set(); // 문을 열어준다.
         }
     }
 
