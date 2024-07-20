@@ -1,6 +1,7 @@
 ﻿namespace ServerCore
 {
     /* AutoResetEvent */
+    // 톨게이트 같은 느낌
     class Lock
     {
         AutoResetEvent _available = new AutoResetEvent(true); // _available가 true면 누구나 들어올 수 있는 상태, false면 반대.
