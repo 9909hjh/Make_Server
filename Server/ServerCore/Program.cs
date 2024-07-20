@@ -1,58 +1,49 @@
 ﻿namespace ServerCore
 {
-    // 데드락 상황 예제
-    class SessionManager
+    class SpinLock
     {
-        static object _lock = new object();
+        volatile int _locked = 0;
 
-        public static void TestSession()
+        public void Acquire()
         {
-            lock (_lock)
+            while(true)
             {
+                //int original = Interlocked.Exchange(ref _locked, 1); // 통상적으로 이런 방식은
+                //사용하지 않지만 기본 원리를 보여주는 코드다.
+                //if (original == 0)
+                //    break;
 
+                /* CAS : Compare-And-Swap */
+                // 일반적으로 사용하는 방식
+                // Interlocked.CompareExchange(ref _locked, 1, 0);
+
+                int expected = 0; // 내가 예상한 값
+                int desired = 1; // 내가 원하는 값
+                // 내가 예상한 값이 0인데 그 값이 맞다면 내가 원하는 값을 넣어준다.
+                if (Interlocked.CompareExchange(ref _locked, desired, expected) == expected) 
+                    break;
             }
+
         }
 
-        public static void Test()
+        public void Release()
         {
-            lock (_lock)
-            {
-                UserManager.TestUser();
-            }
-        }
-    }
-
-    class UserManager
-    {
-        static object _lock = new object();
-
-        public static void Test()
-        {
-            lock (_lock)
-            {
-                SessionManager.TestSession();
-            }
-        }
-
-        public static void TestUser()
-        {
-            lock (_lock)
-            {
-
-            }
+            _locked = 0;
         }
     }
 
     internal class Program
     {
-        static int number = 0;
-        static object _obj = new object();
+        static int _num = 0;
+        static SpinLock _lock = new SpinLock();
 
         static void Thread_1()
         {
-            for(int i = 0; i < 100000; i++)
+            for(int  i = 0; i < 100000; i++)
             {
-                SessionManager.Test();
+                _lock.Acquire();
+                _num++;
+                _lock.Release();
             }
         }
 
@@ -60,24 +51,23 @@
         {
             for (int i = 0; i < 100000; i++)
             {
-                UserManager.Test();
+                _lock.Acquire();
+                _num--;
+                _lock.Release();
             }
         }
 
+        
         static void Main(string[] args)
         {
             Task t1 = new Task(Thread_1);
             Task t2 = new Task(Thread_2);
             t1.Start();
-
-            Thread.Sleep(100);  // 사실 데드락이 걸리면 오류를 수정하는 쪽이 좋지만
-                                // 정 안된다면 시간을 두고 시작하도록 하는 방법이 있다 추천하진 않음.
-
             t2.Start();
 
             Task.WaitAll(t1, t2);
 
-            Console.WriteLine(number);
+            Console.WriteLine(_num);
         }
     }
 }
