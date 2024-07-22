@@ -1,49 +1,38 @@
 ﻿namespace ServerCore
 {
+    /* TLS : Thread Local Storage */
+    /*
+    - 전역(정적static) : 누구나 접근 가능
+    - 스택 : 현재 쓰레드만 접근 가능 BUT 함수가 끝나면 폭파되는 공간
+    - TLS : 스택처럼 현재 쓰레드만 접근 가능 BUT 함수가 호출 완료되도 여전히 유효한 공간
+
+    이렇게 구분할 수가 있다.
+    즉 쓰레드끼리 경합이 일어나지 않고 안전하면서도,
+    반영구적으로 안전히 사용할 수 있는 공간이라는 것.*/
+
     internal class Program
     {
-        static int _num = 0;
-
-        // Mutex는 AutoReset과 같게 동작하지만 더 많은 정보를 갖고 있다.
-
-        // 갖는 정보 : int count, ThreadID ...
-        // 예를 들어 몇번이나 잠궜는지 카운팅을 하고 있다. 그래서 잠근 만큼 풀어줘야 최종적으로 풀리게 되어있다.
-        // 또한 ID를 갖고 있어 엉뚱한 곳에서 ReleaseMutex를 하는 것을 방지할 수 있다.
-
-        // 그래서 추가 비용이 많이 들어가고 느려서 어지간해서는 오토리셋을 사용한다.
-        static Mutex _lock = new Mutex();
-
-        static void Thread_1()
-        {
-            for(int  i = 0; i < 100000; i++)
-            {
-                _lock.WaitOne();
-                _num++;
-                _lock.ReleaseMutex();
-            }
-        }
-
-        static void Thread_2()
-        {
-            for (int i = 0; i < 100000; i++)
-            {
-                _lock.WaitOne();
-                _num--;
-                _lock.ReleaseMutex();
-            }
-        }
-
+        //thread마다 얘를 접근하면은 자신만의 공간에다가 얘가 저장이 되기 때문에
+        //특정 thread에서 thread name을 고친다고 해도 다른 애들한테는 영향을 주지 않게 된다.
+        static ThreadLocal<string> ThreadName = new ThreadLocal<string>(() => { return $"my name is {Thread.CurrentThread.ManagedThreadId}"; });
         
+        static void WhoAmI()
+        {
+            bool repeat = ThreadName.IsValueCreated;
+            if(repeat)
+                Console.WriteLine(ThreadName.Value + "(repeat)");
+            else
+                Console.WriteLine(ThreadName.Value);
+        }
+
         static void Main(string[] args)
         {
-            Task t1 = new Task(Thread_1);
-            Task t2 = new Task(Thread_2);
-            t1.Start();
-            t2.Start();
+            ThreadPool.SetMinThreads(1, 1);
+            ThreadPool.SetMaxThreads(3, 3);
 
-            Task.WaitAll(t1, t2);
+            Parallel.Invoke(WhoAmI, WhoAmI, WhoAmI, WhoAmI, WhoAmI, WhoAmI, WhoAmI);
 
-            Console.WriteLine(_num);
+            ThreadName.Dispose(); // 필요가 없어졌다면 없애버릴 수도 있다.
         }
     }
 }
